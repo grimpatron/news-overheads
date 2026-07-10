@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Расходы + Овердрафт</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <style>
         * {
             box-sizing: border-box;
@@ -164,7 +165,10 @@
         }
 
         .output-area--overdraft {
-            padding: 40px 160px 20px 40px;
+            width: 360px;
+            padding: 20px;
+            margin: 40px auto;
+            background-color: #fafaf8;
         }
 
         button.copy-btn {
@@ -206,6 +210,10 @@
                 <span class="label">Стоимость груза (USD):</span>
                 <input type="text" id="insurance" value="0" placeholder="страховая стоимость">
             </div>
+            <div class="row">
+                <span class="label">Платёжка (USD):</span>
+                <input type="text" id="remittance" value="70" placeholder="стоимость платёжки">
+            </div>
             <div class="radio-group">
                 <label><input type="radio" name="delivery_type" value="standard" checked> Прямой (10%)</label>
                 <label><input type="radio" name="delivery_type" value="expedition"> Экспедиция (5%)</label>
@@ -219,10 +227,6 @@
 
         <div class="card">
             <h2>Расчёт Овердрафта</h2>
-            <!-- <div class="row">
-                <span class="label">Сумма кредита (USD):</span>
-                <input type="text" id="usdAmount" value="8000" placeholder="8000">
-            </div> -->
             <div class="row">
                 <span class="label">Количество дней:</span>
                 <input type="text" id="days" value="45" placeholder="45">
@@ -269,8 +273,9 @@
         const CONSTANTS_SHIP = {
             INSURANCE_RATE: 0.0015,
             RATE_DIFF_PERCENT: 0.01,
-            ADDITIONAL_FEE: 20,
+            // ADDITIONAL_FEE: 20,
             PROFIT_RATES: { standard: 0.10, expedition: 0.05 },
+            PROFIT_PERCENT: { standard: 10, expedition: 5 },
             ALIGN_WIDTH: 6,
         };
 
@@ -290,16 +295,18 @@
         function calculateShipping() {
             const price = getNumber('price', 0);
             const cargoValue = getNumber('insurance', 0);
+            const remittanceValue = getNumber('remittance', 0);
             const overdraftValue = Math.ceil(parseFloat(document.querySelector('#resIntUsd').innerText) || 0);
             const deliveryType = document.querySelector('input[name="delivery_type"]:checked')?.value || 'standard';
             const checkboxLtl = document.getElementById('ltl-mode');
 
             const insuranceFee = Math.ceil(cargoValue * CONSTANTS_SHIP.INSURANCE_RATE);
+            const insuranceSign = insuranceFee == 0 ? "?" : insuranceFee;
             const rateDiff = Math.ceil(price * CONSTANTS_SHIP.RATE_DIFF_PERCENT);
 
             const baseSum = (checkboxLtl.checked)
                 ? price + insuranceFee
-                : price + insuranceFee + rateDiff + overdraftValue + CONSTANTS_SHIP.ADDITIONAL_FEE;
+                : price + insuranceFee + rateDiff + overdraftValue + remittanceValue;
 
             const profit = Math.ceil(baseSum * CONSTANTS_SHIP.PROFIT_RATES[deliveryType]);
             const total = baseSum + profit;
@@ -309,15 +316,15 @@
             const isLtl = checkboxLtl ? checkboxLtl.checked : false;
             const overdraftStr = isLtl ? '' : `${leftAlign(overdraftValue, w)} USD Overdraft = 45 days\n`;
             const rateDiffStr = isLtl ? '' : `${leftAlign(rateDiff, w)} USD Курсовая разница (1%)\n`;
-            const additionalFeeStr = isLtl ? '' : `${leftAlign(CONSTANTS_SHIP.ADDITIONAL_FEE, w)} USD платёжка\n`;
+            const additionalFeeStr = isLtl ? '' : `${leftAlign(remittanceValue, w)} USD платёжка\n`;
 
-            const resultText = `Агент: Yusheng (ЗБК)
+            const resultText = `Agent: Yusheng (ЗБК)
 ${leftAlign(price, w)} USD Freight
 -      USD Довоз
-${leftAlign(insuranceFee, w)} USD Страхование (от ${cargoValue}$)
+${leftAlign(insuranceSign, w)} USD Страхование ${cargoValue > 0 ? '(от ' + cargoValue + '$)' : ''}
 ${overdraftStr}${rateDiffStr}${additionalFeeStr}-----------------------------------
 ${leftAlign(baseSum, w)} USD 
-${leftAlign(profit, w)} USD Profit
+${leftAlign(profit, w)} USD Profit (${CONSTANTS_SHIP.PROFIT_PERCENT[deliveryType]}%)
 -----------------------------------
 SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}`;
 
@@ -389,7 +396,7 @@ SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}`;
             document.getElementById('resRate').innerHTML = usdRate.toFixed(4) + ' BYN';
             document.getElementById('resByn').innerHTML = bynAmount.toFixed(2) + ' BYN';
             document.getElementById('resDays').innerHTML = days + ' ' + declensionDays(days);
-            document.getElementById('resAnnual').innerHTML = annualPercent.toFixed(2) + '% (годовая)';
+            document.getElementById('resAnnual').innerHTML = annualPercent.toFixed(2) + '%';
             document.getElementById('resDaily').innerHTML = dailyRate.toFixed(9);
             document.getElementById('resIntByn').innerHTML = interestByn.toFixed(4) + ' BYN';
             document.getElementById('resIntUsd').innerHTML = interestUsd.toFixed(4) + ' USD';
@@ -406,12 +413,14 @@ SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}`;
         document.addEventListener('DOMContentLoaded', () => {
             const priceInput = document.getElementById('price');
             const insuranceInput = document.getElementById('insurance');
+            const remittanceInput = document.getElementById('remittance');
             const radios = document.querySelectorAll('input[name="delivery_type"]');
             const checkboxLtl = document.getElementById('ltl-mode');
             if (checkboxLtl) checkboxLtl.addEventListener('input', calculateShipping);
             if (priceInput) priceInput.addEventListener('input', calculateOverdraft);
             if (priceInput) priceInput.addEventListener('input', calculateShipping);
             if (insuranceInput) insuranceInput.addEventListener('input', calculateShipping);
+            if (remittanceInput) remittanceInput.addEventListener('input', calculateShipping);
             radios.forEach(radio => radio.addEventListener('change', calculateShipping));
             const copyShippingBtn = document.getElementById('copyShippingBtn');
             if (copyShippingBtn) copyShippingBtn.addEventListener('click', copyShipping);
@@ -444,5 +453,5 @@ SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}`;
 
 </html>
 
-<!-- 430 строк -->
+<!-- 450 строк -->
 <!-- USD Overdraft = 45 days -->
