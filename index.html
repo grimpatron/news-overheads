@@ -18,7 +18,6 @@
             padding: 30px 20px;
         }
 
-        /* Общий контейнер для двух калькуляторов */
         .dashboard {
             max-width: 1200px;
             margin: 0 auto;
@@ -28,7 +27,6 @@
             justify-content: center;
         }
 
-        /* Карточка калькулятора */
         .card {
             background: white;
             border-radius: 28px;
@@ -36,7 +34,6 @@
             padding: 24px 28px;
             flex: 1;
             min-width: 360px;
-            transition: 0.2s;
         }
 
         .card h2 {
@@ -74,14 +71,10 @@
         input:focus,
         button:focus {
             outline: none;
-            /* border-color: #1e6f5c; */
             box-shadow: 0 0 0 2px rgba(30, 111, 92, 0.2);
         }
 
         button {
-            /* background: #1e6f5c; */
-            background: #a2b1ad;
-            /* color: white; */
             font-weight: 600;
             border: none;
             cursor: pointer;
@@ -89,9 +82,32 @@
         }
 
         button:hover {
-            /* background: #0f5a4a; */
             background: #7ab8aa;
-            /* transform: translateY(-1px); */
+        }
+
+        button {
+            border: 1px solid var(--border);
+            color: #07130c;
+            font-weight: 700;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        button.copy-btn,
+        button#refreshRateBtn {
+            border: none;
+            background: linear-gradient(180deg, #4ade80 0%, #289c55 100%);
+            transition: filter 0.3s ease-in-out;
+        }
+
+        button#refreshRateBtn {
+            padding: 8px;
+        }
+
+        button.copy-btn:hover,
+        button#refreshRateBtn:hover {
+            filter: brightness(1.08);
         }
 
         .radio-group {
@@ -108,15 +124,9 @@
         textarea {
             width: 100%;
             min-height: 260px;
-            font-family: 'Courier New', monospace;
+            font-family: monospace;
             background: #fafcfd;
             resize: none;
-        }
-
-        hr {
-            margin: 20px 0;
-            border: none;
-            border-top: 2px dotted #cbd5e1;
         }
 
         .inline-group {
@@ -140,7 +150,6 @@
             display: flex;
             justify-content: space-between;
             padding: 2px 0;
-            /* border-bottom: 1px solid #e2e8f0; */
             font-size: 0.95rem;
         }
 
@@ -177,14 +186,6 @@
             padding: 8px 16px;
         }
 
-        .separator {
-            width: 100%;
-            text-align: center;
-            margin: 10px 0;
-            font-weight: bold;
-            color: #6c8eae;
-        }
-
         @media (max-width: 900px) {
             .dashboard {
                 flex-direction: column;
@@ -199,7 +200,6 @@
 
 <body>
     <div class="dashboard">
-        <!-- БЛОК 1: КАЛЬКУЛЯТОР ДОСТАВКИ (ЭКСПЕДИРОВАНИЕ) -->
         <div class="card">
             <h2>Калькулятор расходов</h2>
             <div class="row">
@@ -209,15 +209,17 @@
             <div class="row">
                 <span class="label">Стоимость груза (USD):</span>
                 <input type="text" id="insurance" value="0" placeholder="страховая стоимость">
+                <label><input type="checkbox" id="ltl-mode"> LTL</label>
             </div>
             <div class="row">
                 <span class="label">Платёжка (USD):</span>
                 <input type="text" id="remittance" value="70" placeholder="стоимость платёжки">
             </div>
-            <div class="radio-group">
-                <label><input type="radio" name="delivery_type" value="standard" checked> Прямой (10%)</label>
-                <label><input type="radio" name="delivery_type" value="expedition"> Экспедиция (5%)</label>
-                <label><input type="checkbox" name="" id="ltl-mode"> LTL</label>
+            <div class="row">
+                <span class="label">Профит (%):</span>
+                <input type="text" id="profitInput" value="10" style="width:60px;">
+                <label><input type="radio" name="delivery_type" value="standard" checked> Прямой</label>
+                <label><input type="radio" name="delivery_type" value="expedition"> Экспедиция</label>
             </div>
             <div class="output-area output-area--calculator">
                 <textarea id="resultShipping" rows="12" readonly></textarea>
@@ -239,12 +241,10 @@
                 <span class="label">Курс USD → BYN:</span>
                 <div class="inline-group" style="flex:1">
                     <div class="field"><input type="text" id="usdRate" placeholder="загружается..."></div>
-                    <button id="refreshRateBtn">Обновить</button>
+                    <button id="refreshRateBtn">обновить</button>
                 </div>
             </div>
             <div class="small-note" id="rateStatus">⏳ Загрузка курса НБРБ...</div>
-            <!-- <button id="calcOverdraftBtn" style="margin: 12px 0 16px;">🧮 Рассчитать проценты</button> -->
-
             <div class="output-area output-area--overdraft">
                 <div id="resultsOverdraft">
                     <div class="result-line"><span class="result-label">Сумма в USD:</span><span class="result-value"
@@ -269,13 +269,10 @@
     </div>
 
     <script>
-        // ======================= 1. КАЛЬКУЛЯТОР ДОСТАВКИ (экспедирование) =======================
+        // ======================= 1. КАЛЬКУЛЯТОР ДОСТАВКИ =======================
         const CONSTANTS_SHIP = {
             INSURANCE_RATE: 0.0015,
             RATE_DIFF_PERCENT: 0.01,
-            // ADDITIONAL_FEE: 20,
-            PROFIT_RATES: { standard: 0.10, expedition: 0.05 },
-            PROFIT_PERCENT: { standard: 10, expedition: 5 },
             ALIGN_WIDTH: 6,
         };
 
@@ -297,8 +294,8 @@
             const cargoValue = getNumber('insurance', 0);
             const remittanceValue = getNumber('remittance', 0);
             const overdraftValue = Math.ceil(parseFloat(document.querySelector('#resIntUsd').innerText) || 0);
-            const deliveryType = document.querySelector('input[name="delivery_type"]:checked')?.value || 'standard';
             const checkboxLtl = document.getElementById('ltl-mode');
+            const profitPercent = parseFloat(document.getElementById('profitInput').value) || 0;
 
             const insuranceFee = Math.ceil(cargoValue * CONSTANTS_SHIP.INSURANCE_RATE);
             const insuranceSign = insuranceFee == 0 ? "?" : insuranceFee;
@@ -308,13 +305,13 @@
                 ? price + insuranceFee
                 : price + insuranceFee + rateDiff + overdraftValue + remittanceValue;
 
-            const profit = Math.ceil(baseSum * CONSTANTS_SHIP.PROFIT_RATES[deliveryType]);
+            const profit = Math.ceil(baseSum * (profitPercent / 100));
             const total = baseSum + profit;
             const finalPrice = Math.ceil(total / 10) * 10;
 
             const w = CONSTANTS_SHIP.ALIGN_WIDTH;
             const isLtl = checkboxLtl ? checkboxLtl.checked : false;
-            const overdraftStr = isLtl ? '' : `${leftAlign(overdraftValue, w)} USD Overdraft = 45 days\n`;
+            const overdraftStr = isLtl ? '' : `${leftAlign(overdraftValue, w)} USD Overdraft (${document.getElementById('days').value} days)\n`;
             const rateDiffStr = isLtl ? '' : `${leftAlign(rateDiff, w)} USD Курсовая разница (1%)\n`;
             const additionalFeeStr = isLtl ? '' : `${leftAlign(remittanceValue, w)} USD платёжка\n`;
 
@@ -322,19 +319,18 @@
 ${leftAlign(price, w)} USD Freight
 -      USD Довоз
 ${leftAlign(insuranceSign, w)} USD Страхование ${cargoValue > 0 ? '(от ' + cargoValue + '$)' : ''}
-${overdraftStr}${rateDiffStr}${additionalFeeStr}-----------------------------------
+${overdraftStr}${rateDiffStr}${additionalFeeStr}╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
 ${leftAlign(baseSum, w)} USD 
-${leftAlign(profit, w)} USD Profit (${CONSTANTS_SHIP.PROFIT_PERCENT[deliveryType]}%)
------------------------------------
-SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}`;
-
+${leftAlign(profit, w)} USD Profit (${profitPercent}%)
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯`;
             document.getElementById('resultShipping').value = resultText;
         }
 
         function copyShipping() {
             const textarea = document.getElementById('resultShipping');
             if (!textarea) return;
-            // textarea.select();
             navigator.clipboard.writeText(textarea.value).then(() => {
                 const btn = document.getElementById('copyShippingBtn');
                 const original = btn.innerText;
@@ -343,7 +339,7 @@ SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}`;
             }).catch(console.warn);
         }
 
-        // ======================= 2. КАЛЬКУЛЯТОР ОВЕРДРАФТ (курс НБРБ) =======================
+        // ======================= 2. КАЛЬКУЛЯТОР ОВЕРДРАФТ =======================
         async function fetchNBRB_USD_Rate() {
             const rateInput = document.getElementById('usdRate');
             const statusSpan = document.getElementById('rateStatus');
@@ -409,6 +405,19 @@ SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}`;
             return 'дней';
         }
 
+        function setProfitFromRadio() {
+            const checkedRadio = document.querySelector('input[name="delivery_type"]:checked');
+            if (!checkedRadio) return;
+            const value = checkedRadio.value;
+            const profitInput = document.getElementById('profitInput');
+            if (value === 'standard') {
+                profitInput.value = '10';
+            } else if (value === 'expedition') {
+                profitInput.value = '5';
+            }
+            calculateShipping();
+        }
+
         // ======================= ИНИЦИАЛИЗАЦИЯ =======================
         document.addEventListener('DOMContentLoaded', () => {
             const priceInput = document.getElementById('price');
@@ -416,42 +425,49 @@ SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}`;
             const remittanceInput = document.getElementById('remittance');
             const radios = document.querySelectorAll('input[name="delivery_type"]');
             const checkboxLtl = document.getElementById('ltl-mode');
-            if (checkboxLtl) checkboxLtl.addEventListener('input', calculateShipping);
-            if (priceInput) priceInput.addEventListener('input', calculateOverdraft);
-            if (priceInput) priceInput.addEventListener('input', calculateShipping);
-            if (insuranceInput) insuranceInput.addEventListener('input', calculateShipping);
-            if (remittanceInput) remittanceInput.addEventListener('input', calculateShipping);
-            radios.forEach(radio => radio.addEventListener('change', calculateShipping));
-            const copyShippingBtn = document.getElementById('copyShippingBtn');
-            if (copyShippingBtn) copyShippingBtn.addEventListener('click', copyShipping);
-            calculateOverdraft();
-            calculateShipping();
-
-            // ---- Овердрафт ----
-            const usdAmount = document.getElementById('usdAmount');
+            const profitInput = document.getElementById('profitInput');
             const daysField = document.getElementById('days');
             const annualField = document.getElementById('annualPercent');
             const usdRateField = document.getElementById('usdRate');
-            // const calcBtn = document.getElementById('calcOverdraftBtn');
             const refreshBtn = document.getElementById('refreshRateBtn');
 
-            if (usdAmount) usdAmount.addEventListener('input', calculateOverdraft);
-            if (daysField) daysField.addEventListener('input', calculateOverdraft);
-            if (annualField) annualField.addEventListener('input', calculateOverdraft);
-            if (usdRateField) usdRateField.addEventListener('input', calculateOverdraft);
-            // if (calcBtn) calcBtn.addEventListener('click', calculateOverdraft);
+            // События для пересчёта
+            if (priceInput) priceInput.addEventListener('input', () => { calculateOverdraft(); calculateShipping(); });
+            if (insuranceInput) insuranceInput.addEventListener('input', calculateShipping);
+            if (remittanceInput) remittanceInput.addEventListener('input', calculateShipping);
+            if (checkboxLtl) checkboxLtl.addEventListener('input', calculateShipping);
+            if (daysField) daysField.addEventListener('input', () => { calculateOverdraft(); calculateShipping(); });
+            if (annualField) annualField.addEventListener('input', () => { calculateOverdraft(); calculateShipping(); });
+            if (usdRateField) usdRateField.addEventListener('input', () => { calculateOverdraft(); calculateShipping(); });
+
+            if (profitInput) {
+                profitInput.addEventListener('input', function () {
+                    document.querySelectorAll('input[name="delivery_type"]').forEach(radio => radio.checked = false);
+                    calculateShipping();
+                });
+            }
+
+            // Радиокнопки – устанавливают процент и пересчитывают
+            radios.forEach(radio => radio.addEventListener('change', setProfitFromRadio));
+
+            // Кнопка копирования
+            const copyBtn = document.getElementById('copyShippingBtn');
+            if (copyBtn) copyBtn.addEventListener('click', copyShipping);
+
+            // Кнопка обновления курса
             if (refreshBtn) refreshBtn.addEventListener('click', async () => {
                 await fetchNBRB_USD_Rate();
                 calculateOverdraft();
+                calculateShipping();
             });
 
-            // Загружаем курс НБРБ и делаем первый расчёт
-            fetchNBRB_USD_Rate().then(() => calculateOverdraft());
+            setProfitFromRadio();
+            fetchNBRB_USD_Rate().then(() => {
+                calculateOverdraft();
+                calculateShipping();
+            });
         });
     </script>
 </body>
 
 </html>
-
-<!-- 450 строк -->
-<!-- USD Overdraft = 45 days -->
