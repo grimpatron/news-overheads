@@ -2,10 +2,10 @@
 <html lang="ru">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Расходы + Овердрафт</title>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
     <style>
         * {
             box-sizing: border-box;
@@ -36,6 +36,10 @@
             min-width: 360px;
         }
 
+        .card--main {
+            max-width: 480px;
+        }
+
         .card h2 {
             margin: 0 0 10px;
             text-align: center;
@@ -43,18 +47,34 @@
             color: #1a4e6e;
         }
 
+        .card h3 {
+            margin: 10px 0 10px;
+            text-align: center;
+            font-size: 1.05rem;
+            color: #1a4e6e;
+            /* border-bottom: 2px solid #e6edf3; */
+            padding-bottom: 6px;
+        }
+
         .row {
             margin-bottom: 6px;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 10px;
+            gap: 5px;
         }
 
         .label {
             display: inline-block;
             width: 180px;
             font-weight: 600;
+            color: #1e4663;
+        }
+
+        .label-sm {
+            width: auto;
+            font-weight: 500;
+            font-size: 0.9rem;
             color: #1e4663;
         }
 
@@ -74,6 +94,10 @@
             box-shadow: 0 0 0 2px rgba(30, 111, 92, 0.2);
         }
 
+        input[type="text"] {
+            width: 86px;
+        }
+
         button {
             font-weight: 600;
             border: none;
@@ -87,7 +111,8 @@
 
         button {
             border: 1px solid var(--border);
-            color: #07130c;
+            /* color: #07130c; */
+            color: #ffffff;
             font-weight: 700;
             padding: 10px 14px;
             border-radius: 10px;
@@ -102,6 +127,7 @@
         }
 
         button#refreshRateBtn {
+            margin-top: 10px;
             padding: 8px;
         }
 
@@ -174,16 +200,115 @@
         }
 
         .output-area--overdraft {
-            width: 360px;
-            padding: 20px;
-            margin: 40px auto;
+            width: 320px;
+            /* padding: 20px; */
+            padding: 12px;
+            /* margin: 40px auto; */
             background-color: #fafaf8;
+            border: 1px solid #dce7f2;
         }
 
         button.copy-btn {
             margin-top: 12px;
             width: auto;
             padding: 8px 16px;
+        }
+
+        .overdraft-input {
+            padding: 16px 0;
+
+        }
+
+        /* ---------- Insurance block ---------- */
+        .insurance-block {
+            background: #f6faff;
+            border-radius: 18px;
+            padding: 16px 10px;
+            /* margin: 12px 0 16px; */
+            border: 1px solid #dce7f2;
+        }
+
+        .insurance-block .ib-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2px 0;
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .insurance-block .ib-row:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            color: #0b3d5c;
+        }
+
+        .insurance-block .ib-row .ib-label {
+            color: #1e4663;
+        }
+
+        .insurance-block .ib-row .ib-value {
+            font-family: monospace;
+            font-weight: 500;
+        }
+
+        .insurance-block .ib-total {
+            /* border-top: 2px solid #b8ccdd; */
+            /* padding-top: 6px; */
+            /* margin-top: 4px; */
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .insurance-block .ib-total.ib-value {
+            color: #0b5e3c;
+            font-weight: 700;
+        }
+
+        .insurance-block .ib-row.ib-premium {
+            background: #e4f0e9;
+            border-radius: 8px;
+            padding: 6px 12px;
+            margin-top: 4px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            border-bottom: none;
+        }
+
+        .insurance-block .ib-row.ib-premium .ib-value {
+            color: #0b5e3c;
+            font-weight: 700;
+        }
+
+        .rate-group {
+            /* display: flex;
+            flex-wrap: wrap;
+            gap: 12px 24px;
+            align-items: center; */
+            /* background: #f6faff; */
+            /* border-radius: 14px; */
+            padding: 8px 0;
+            /* margin: 6px 0 10px; */
+            /* border: 1px solid #dce7f2; */
+        }
+
+        .rate-group .rate-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rate-group .rate-item input {
+            width: 60px;
+            text-align: center;
+            padding: 2px 4px;
+        }
+
+        .rate-group .rate-item .label-sm {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #1e4663;
+            white-space: nowrap;
         }
 
         @media (max-width: 900px) {
@@ -194,84 +319,165 @@
             .label {
                 width: 100%;
             }
+
+            .rate-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .rate-group .rate-item {
+                justify-content: space-between;
+            }
+
+            .output-area--overdraft {
+                width: 100%;
+            }
         }
     </style>
 </head>
 
 <body>
     <div class="dashboard">
-        <div class="card">
+
+        <!-- ========== КАЛЬКУЛЯТОР РАСХОДОВ ========== -->
+        <div class="card card--main">
             <h2>Калькулятор расходов</h2>
+
             <div class="row">
                 <span class="label">Ставка нетто (USD):</span>
-                <input type="text" id="price" value="0" placeholder="нетто USD">
+                <input type="text" id="price" value="0" placeholder="нетто USD" />
             </div>
+
             <div class="row">
                 <span class="label">Стоимость груза (USD):</span>
-                <input type="text" id="insurance" value="0" placeholder="страховая стоимость">
-                <label><input type="checkbox" id="ltl-mode"> LTL</label>
+                <input type="text" id="insurance" value="0" placeholder="страховая стоимость" />
+                <label><input type="checkbox" id="ltl-mode" /> LTL</label>
             </div>
+
             <div class="row">
                 <span class="label">Платёжка (USD):</span>
-                <input type="text" id="remittance" value="70" placeholder="стоимость платёжки">
+                <input type="text" id="remittance" value="70" placeholder="стоимость платёжки" />
             </div>
+
             <div class="row">
                 <span class="label">Профит (%):</span>
-                <input type="text" id="profitInput" value="10" style="width:60px;">
-                <label><input type="radio" name="delivery_type" value="standard" checked> Прямой</label>
-                <label><input type="radio" name="delivery_type" value="expedition"> Экспедиция</label>
+                <input type="text" id="profitInput" value="10" />
             </div>
+            <div class="row">
+                <label><input type="radio" name="delivery_type" value="standard" checked /> Прямой</label>
+                <label><input type="radio" name="delivery_type" value="expedition" /> Экспедиция</label>
+            </div>
+
             <div class="output-area output-area--calculator">
                 <textarea id="resultShipping" rows="12" readonly></textarea>
                 <button id="copyShippingBtn" class="copy-btn">Копировать</button>
             </div>
         </div>
 
+        <!-- ========== ОВЕРДРАФТ ========== -->
         <div class="card">
-            <h2>Расчёт Овердрафта</h2>
-            <div class="row">
-                <span class="label">Количество дней:</span>
-                <input type="text" id="days" value="45" placeholder="45">
-            </div>
-            <div class="row">
-                <span class="label">Годовая ставка (%):</span>
-                <input type="text" id="annualPercent" value="13.13" placeholder="13.13">
-            </div>
-            <div class="row">
-                <span class="label">Курс USD → BYN:</span>
-                <div class="inline-group" style="flex:1">
-                    <div class="field"><input type="text" id="usdRate" placeholder="загружается..."></div>
-                    <button id="refreshRateBtn">обновить</button>
+            <h3>Расчёт Овердрафта</h2>
+                <div class="overdraft-block" style="display: flex; gap: 5px;">
+                    <div class="overdraft-input" style="flex: 1.1">
+                        <div class="row">
+                            <span class="label">Количество дней:</span>
+                            <input type="text" id="days" value="45" placeholder="45" />
+                        </div>
+
+                        <div class="row">
+                            <span class="label">Годовая ставка (%):</span>
+                            <input type="text" id="annualPercent" value="13.13" placeholder="13.13" />
+                        </div>
+
+                        <div class="row">
+                            <span class="label">Курс USD → BYN:</span>
+                            <div class="inline-group" style="flex:1">
+                                <div class="field"><input type="text" id="usdRate" placeholder="загружается..." /></div>
+                            </div>
+                        </div>
+                        <div class="small-note" id="rateStatus">⏳ Загрузка курса НБРБ...</div>
+                        <!-- <div class="small-note"></div> -->
+                        <button id="refreshRateBtn">обновить курс</button>
+                    </div>
+                    <div class="output-area output-area--overdraft" style="flex: 1">
+                        <div id="resultsOverdraft">
+                            <div class="result-line"><span class="result-label">Сумма в USD:</span><span
+                                    class="result-value" id="resUsd">—</span></div>
+                            <div class="result-line"><span class="result-label">Курс USD/BYN:</span><span
+                                    class="result-value" id="resRate">—</span></div>
+                            <div class="result-line"><span class="result-label">Сумма в BYN:</span><span
+                                    class="result-value" id="resByn">—</span></div>
+                            <div class="result-line"><span class="result-label">Дней:</span><span class="result-value"
+                                    id="resDays">—</span></div>
+                            <div class="result-line"><span class="result-label">Годовая ставка:</span><span
+                                    class="result-value" id="resAnnual">—</span></div>
+                            <div class="result-line"><span class="result-label">Дневная ставка:</span><span
+                                    class="result-value" id="resDaily">—</span></div>
+                            <div class="result-line"><span class="result-label">Проценты (BYN):</span><span
+                                    class="result-value" id="resIntByn">—</span></div>
+                            <div class="result-line"><span class="result-label">Проценты (USD):</span><span
+                                    class="result-value" id="resIntUsd">—</span></div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="small-note" id="rateStatus">⏳ Загрузка курса НБРБ...</div>
-            <div class="output-area output-area--overdraft">
-                <div id="resultsOverdraft">
-                    <div class="result-line"><span class="result-label">Сумма в USD:</span><span class="result-value"
-                            id="resUsd">—</span></div>
-                    <div class="result-line"><span class="result-label">Курс USD/BYN:</span><span class="result-value"
-                            id="resRate">—</span></div>
-                    <div class="result-line"><span class="result-label">Сумма в BYN:</span><span class="result-value"
-                            id="resByn">—</span></div>
-                    <div class="result-line"><span class="result-label">Дней:</span><span class="result-value"
-                            id="resDays">—</span></div>
-                    <div class="result-line"><span class="result-label">Годовая ставка:</span><span class="result-value"
-                            id="resAnnual">—</span></div>
-                    <div class="result-line"><span class="result-label">Дневная ставка:</span><span class="result-value"
-                            id="resDaily">—</span></div>
-                    <div class="result-line"><span class="result-label">Проценты (BYN):</span><span class="result-value"
-                            id="resIntByn">—</span></div>
-                    <div class="result-line"><span class="result-label">Проценты (USD):</span><span class="result-value"
-                            id="resIntUsd">—</span></div>
+
+                <!-- Блок ставок для страхования -->
+                <h3>Расчёт страховой суммы</h3>
+                <div class="overdraft-block" style="display: flex; gap: 5px">
+                    <div class="rate-group" style="flex: 1">
+                        <div class="row">
+                            <span class="label">НДС (%):</span>
+                            <input type="text" id="vatRate" value="20" />
+                        </div>
+                        <div class="row">
+                            <span class="label">Пошлина (%):</span>
+                            <input type="text" id="customsRate" value="10" />
+                        </div>
+                        <div class="row">
+                            <span class="label">Страхование (%):</span>
+                            <input type="text" id="insRate" value="0.1" />
+                        </div>
+                    </div>
+
+                    <!-- Блок Страхование (детальный расчёт) -->
+                    <div class="insurance-block" id="insuranceBlock" style="flex: 1.1">
+                        <div class="ib-row">
+                            <span class="ib-label">Стоимость груза</span>
+                            <span class="ib-value" id="ibCargo">0.00 USD</span>
+                        </div>
+                        <div class="ib-row">
+                            <span class="ib-label" id="ibVatLabel">НДС (20%)</span>
+                            <span class="ib-value" id="ibVat">0.00 USD</span>
+                        </div>
+                        <div class="ib-row">
+                            <span class="ib-label" id="ibCustomsLabel">Таможенная пошлина (10%)</span>
+                            <span class="ib-value" id="ibCustoms">0.00 USD</span>
+                        </div>
+                        <div class="ib-row">
+                            <span class="ib-label">Фрахт за перевозку</span>
+                            <span class="ib-value" id="ibFreight">0.00 USD</span>
+                        </div>
+                        <div class="ib-row">
+                            <span class="ib-label ib-total">Итого страховая сумма</span>
+                            <span class="ib-value ib-total" id="ibTotal">0.00 USD</span>
+                        </div>
+                        <div class="ib-row">
+                            <span class="ib-label" id="ibRateLabel">Страховой тариф</span>
+                            <span class="ib-value" id="ibRate">0.1%</span>
+                        </div>
+                        <div class="ib-row ib-premium">
+                            <span class="ib-label">Страховка: </span>
+                            <span class="ib-value" id="ibPremium">0.00 USD</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
         </div>
     </div>
 
     <script>
-        // ======================= 1. КАЛЬКУЛЯТОР ДОСТАВКИ =======================
+        // ================================================================
+        //  1.  КАЛЬКУЛЯТОР ДОСТАВКИ  (с новым блоком страхования)
         const CONSTANTS_SHIP = {
-            INSURANCE_RATE: 0.0015,
             RATE_DIFF_PERCENT: 0.01,
             ALIGN_WIDTH: 6,
         };
@@ -289,6 +495,40 @@
             return isNaN(val) ? defaultValue : val;
         }
 
+        // ——— Обновление блока страхования ———
+        function updateInsuranceBlock() {
+            const cargo = getNumber('insurance', 0);
+            const freight = getNumber('price', 0);
+            const vatRate = getNumber('vatRate', 20);
+            const customsRate = getNumber('customsRate', 10);
+            const insRate = getNumber('insRate', 0.1);
+
+            const vat = cargo * vatRate / 100;
+            const customs = cargo * customsRate / 100;
+            const insuredTotal = cargo + vat + customs + freight;
+            const premium = insuredTotal * insRate / 100;
+            const premiumRounded = Math.round(premium * 100) / 100;
+
+            // Форматирование
+            const fmt = (v) => v.toFixed(2) + ' USD';
+            // const fmtRate = (v) => v.toFixed(4) + '%';
+
+            document.getElementById('ibCargo').textContent = fmt(cargo);
+            document.getElementById('ibVatLabel').textContent = 'НДС (' + vatRate + '%)';
+            document.getElementById('ibVat').textContent = fmt(vat);
+            document.getElementById('ibCustomsLabel').textContent = 'Таможенная пошлина (' + customsRate + '%)';
+            document.getElementById('ibCustoms').textContent = fmt(customs);
+            document.getElementById('ibFreight').textContent = fmt(freight);
+            document.getElementById('ibTotal').textContent = fmt(insuredTotal);
+            document.getElementById('ibRateLabel').textContent = 'Ставка страхования';
+            document.getElementById('ibRate').textContent = insRate + '%';
+            document.getElementById('ibPremium').textContent = fmt(premiumRounded);
+
+            // Возвращаем рассчитанную премию для использования в shipping
+            return premiumRounded;
+        }
+
+        // ——— Основной расчёт доставки ———
         function calculateShipping() {
             const price = getNumber('price', 0);
             const cargoValue = getNumber('insurance', 0);
@@ -297,35 +537,63 @@
             const checkboxLtl = document.getElementById('ltl-mode');
             const profitPercent = parseFloat(document.getElementById('profitInput').value) || 0;
 
-            const insuranceFee = Math.ceil(cargoValue * CONSTANTS_SHIP.INSURANCE_RATE);
-            const insuranceSign = insuranceFee == 0 ? "?" : insuranceFee;
+            // ---- Страхование (новый расчёт) ----
+            const vatRate = getNumber('vatRate', 20);
+            const customsRate = getNumber('customsRate', 10);
+            const insRate = getNumber('insRate', 0.1);
+
+            const vat = cargoValue * vatRate / 100;
+            const customs = cargoValue * customsRate / 100;
+            const insuredTotal = cargoValue + vat + customs + price;
+            const insuranceFeeRaw = insuredTotal * insRate / 100;
+            const insuranceFee = Math.round(insuranceFeeRaw * 100) / 100; // 2 знака
+
+            // ---- Прочие составляющие ----
             const rateDiff = Math.ceil(price * CONSTANTS_SHIP.RATE_DIFF_PERCENT);
 
-            const baseSum = (checkboxLtl.checked)
-                ? price + insuranceFee
-                : price + insuranceFee + rateDiff + overdraftValue + remittanceValue;
+            // ---- Базовая сумма ----
+            const isLtl = checkboxLtl ? checkboxLtl.checked : false;
+            const baseSum = isLtl ?
+                price + insuranceFee :
+                price + insuranceFee + rateDiff + overdraftValue + remittanceValue;
 
             const profit = Math.ceil(baseSum * (profitPercent / 100));
             const total = baseSum + profit;
             const finalPrice = Math.ceil(total / 10) * 10;
 
+            // ---- Сборка текста ----
             const w = CONSTANTS_SHIP.ALIGN_WIDTH;
-            const isLtl = checkboxLtl ? checkboxLtl.checked : false;
-            const overdraftStr = isLtl ? '' : `${leftAlign(overdraftValue, w)} USD Overdraft (${document.getElementById('days').value} days)\n`;
-            const rateDiffStr = isLtl ? '' : `${leftAlign(rateDiff, w)} USD Курсовая разница (1%)\n`;
-            const additionalFeeStr = isLtl ? '' : `${leftAlign(remittanceValue, w)} USD платёжка\n`;
+            const overdraftStr = isLtl ? '' :
+                `${leftAlign(overdraftValue, w)} USD Overdraft (${document.getElementById('days').value} days)\n`;
+            const rateDiffStr = isLtl ? '' :
+                `${leftAlign(rateDiff, w)} USD Курсовая разница (1%)\n`;
+            const additionalFeeStr = isLtl ? '' :
+                `${leftAlign(remittanceValue, w)} USD платёжка\n`;
 
-            const resultText = `Agent: Yusheng (ЗБК)
-${leftAlign(price, w)} USD Freight
--      USD Довоз
-${leftAlign(insuranceSign, w)} USD Страхование ${cargoValue > 0 ? '(от ' + cargoValue + '$)' : ''}
-${overdraftStr}${rateDiffStr}${additionalFeeStr}╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
-${leftAlign(baseSum, w)} USD 
-${leftAlign(profit, w)} USD Profit (${profitPercent}%)
-╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
-SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}
-╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯`;
+            // Показываем детали страхования в строке
+            const insDisplay = insuranceFee === 0 ? '?' : insuranceFee;
+            const insDetail = (cargoValue > 0 || price > 0) ?
+                // `(${insRate}% от ${insuredTotal.toFixed(2)}$)` :
+                `(от ${cargoValue}$)` :
+                '';
+
+            const resultText =
+                // `Agent: Yusheng (ЗБК)\n` +
+                `${leftAlign(price, w)} USD Freight\n` +
+                `-      USD Довоз\n` +
+                `${leftAlign(insDisplay, w)} USD Страхование ${insDetail}\n` +
+                `${overdraftStr}${rateDiffStr}${additionalFeeStr}` +
+                `╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌\n` +
+                `${leftAlign(baseSum, w)} USD \n` +
+                `${leftAlign(profit, w)} USD Profit (${profitPercent}%)\n` +
+                `╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮\n` +
+                `SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}\n` +
+                `╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯`;
+
             document.getElementById('resultShipping').value = resultText;
+
+            // Обновляем блок страхования (он же возвращает премию)
+            updateInsuranceBlock();
         }
 
         function copyShipping() {
@@ -339,7 +607,8 @@ SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}
             }).catch(console.warn);
         }
 
-        // ======================= 2. КАЛЬКУЛЯТОР ОВЕРДРАФТ =======================
+        // ================================================================
+        //  2.  КАЛЬКУЛЯТОР ОВЕРДРАФТА
         async function fetchNBRB_USD_Rate() {
             const rateInput = document.getElementById('usdRate');
             const statusSpan = document.getElementById('rateStatus');
@@ -354,8 +623,9 @@ SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}
                 if (rate && typeof rate === 'number' && rate > 0) {
                     rate = parseFloat(rate.toFixed(4));
                     rateInput.value = rate;
-                    statusSpan.innerHTML = `✅ Курс обновлён: 1 USD = ${rate} BYN (официальный курс НБРБ)`;
+                    statusSpan.innerHTML = `Курс: 1 USD = ${rate} BYN (официальный курс НБРБ)`;
                     calculateOverdraft();
+                    calculateShipping();
                     return rate;
                 } else {
                     throw new Error('Некорректный формат');
@@ -366,6 +636,7 @@ SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}
                 if (!rateInput.value || rateInput.value === '') {
                     rateInput.value = '2.95';
                     calculateOverdraft();
+                    calculateShipping();
                 }
                 return null;
             }
@@ -418,7 +689,10 @@ SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}
             calculateShipping();
         }
 
-        // ======================= ИНИЦИАЛИЗАЦИЯ =======================
+        // ================================================================
+        //  3.  ИНИЦИАЛИЗАЦИЯ
+        // ================================================================
+
         document.addEventListener('DOMContentLoaded', () => {
             const priceInput = document.getElementById('price');
             const insuranceInput = document.getElementById('insurance');
@@ -431,40 +705,56 @@ SELL: ${finalPrice} USD ${cargoValue > 0 ? '' : '+ страховка'}
             const usdRateField = document.getElementById('usdRate');
             const refreshBtn = document.getElementById('refreshRateBtn');
 
-            // События для пересчёта
-            if (priceInput) priceInput.addEventListener('input', () => { calculateOverdraft(); calculateShipping(); });
-            if (insuranceInput) insuranceInput.addEventListener('input', calculateShipping);
-            if (remittanceInput) remittanceInput.addEventListener('input', calculateShipping);
-            if (checkboxLtl) checkboxLtl.addEventListener('input', calculateShipping);
-            if (daysField) daysField.addEventListener('input', () => { calculateOverdraft(); calculateShipping(); });
-            if (annualField) annualField.addEventListener('input', () => { calculateOverdraft(); calculateShipping(); });
-            if (usdRateField) usdRateField.addEventListener('input', () => { calculateOverdraft(); calculateShipping(); });
+            // Поля страхования
+            const vatField = document.getElementById('vatRate');
+            const customsField = document.getElementById('customsRate');
+            const insField = document.getElementById('insRate');
+
+            // Общая функция пересчёта
+            function recalcAll() {
+                calculateOverdraft();
+                calculateShipping();
+            }
+
+            // События
+            const inputs = [priceInput, insuranceInput, remittanceInput, daysField,
+                annualField, usdRateField, vatField, customsField, insField
+            ];
+            inputs.forEach(el => {
+                if (el) el.addEventListener('input', recalcAll);
+            });
+
+            if (checkboxLtl) checkboxLtl.addEventListener('input', recalcAll);
 
             if (profitInput) {
                 profitInput.addEventListener('input', function () {
-                    document.querySelectorAll('input[name="delivery_type"]').forEach(radio => radio.checked = false);
-                    calculateShipping();
+                    document.querySelectorAll('input[name="delivery_type"]')
+                        .forEach(radio => radio.checked = false);
+                    recalcAll();
                 });
             }
 
-            // Радиокнопки – устанавливают процент и пересчитывают
-            radios.forEach(radio => radio.addEventListener('change', setProfitFromRadio));
+            radios.forEach(radio => radio.addEventListener('change', () => {
+                setProfitFromRadio();
+                recalcAll();
+            }));
 
-            // Кнопка копирования
+            // Копирование
             const copyBtn = document.getElementById('copyShippingBtn');
             if (copyBtn) copyBtn.addEventListener('click', copyShipping);
 
-            // Кнопка обновления курса
-            if (refreshBtn) refreshBtn.addEventListener('click', async () => {
-                await fetchNBRB_USD_Rate();
-                calculateOverdraft();
-                calculateShipping();
-            });
+            // Обновление курса
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', async () => {
+                    await fetchNBRB_USD_Rate();
+                    recalcAll();
+                });
+            }
 
+            // Первый запуск
             setProfitFromRadio();
             fetchNBRB_USD_Rate().then(() => {
-                calculateOverdraft();
-                calculateShipping();
+                recalcAll();
             });
         });
     </script>
